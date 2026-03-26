@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: hermes-control-plane
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+      - key: GROQ_RPM_LIMIT
+        value: "20"
+      - key: HERMES_DEVICE_KEY
+        sync: false
+      - key: HERMES_DEFAULT_DEVICE_ID
+        value: home-pc
+      - key: HERMES_USER_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_SECRET_TOKEN
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_WHATSAPP_FROM
+        sync: false
+      - key: SYSTEM_PROMPT
+        value: You are a helpful assistant. Use tools when needed. Tool calls must use exact function names only.

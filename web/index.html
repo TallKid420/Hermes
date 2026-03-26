@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hermes Remote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">H</div>
+        <div>
+          <h1>Hermes Remote</h1>
+          <p>Render control plane to your PC listener</p>
+        </div>
+      </div>
+
+      <button id="newConversationBtn" class="ghost-button">New conversation</button>
+
+      <div class="settings-card">
+        <label>API Base</label>
+        <input id="apiBaseInput" type="text" placeholder="https://your-render-app.onrender.com">
+        <label>User Token</label>
+        <input id="userTokenInput" type="password" placeholder="Optional">
+        <label>Target Device</label>
+        <input id="deviceIdInput" type="text" placeholder="home-pc">
+        <button id="saveSettingsBtn" class="primary-button">Save settings</button>
+      </div>
+
+      <div class="conversation-head">Recent Conversations</div>
+      <div id="conversationList" class="conversation-list"></div>
+    </aside>
+
+    <main class="chat-panel">
+      <div class="chat-topbar">
+        <div>
+          <div id="conversationTitle" class="conversation-title">No conversation selected</div>
+          <div id="statusText" class="status-text">Idle</div>
+        </div>
+        <button id="refreshBtn" class="ghost-button compact">Refresh</button>
+      </div>
+
+      <div id="messages" class="messages"></div>
+
+      <form id="composerForm" class="composer">
+        <textarea id="messageInput" rows="3" placeholder="Send a task to your PC..."></textarea>
+        <button id="sendBtn" type="submit" class="primary-button">Send</button>
+      </form>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#3b82f6" />
+  <title>Hermes 2.0</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Loading overlay while connecting to local server -->
+  <div class="loading" id="loading">
+    <div class="loading-card">
+      <div class="loading-title">◯ Hermes 2.0</div>
+      <div class="loading-sub">Connecting to local Hermes backend...</div>
+      <div class="loading-log" id="loadingLog"></div>
+      <div class="loading-foot">Make sure <code>python server.py</code> is running.</div>
+    </div>
+  </div>
+
+  <div class="app" id="assistantApp">
+    <!-- Sidebar -->
+    <aside class="panel sidebar">
+      <div class="sidebar-head">
+        <div class="logo">◯ Hermes</div>
+        <div class="sub">Local AI Assistant</div>
+        <input type="text" id="searchInput" class="search-box" placeholder="Search conversations..." />
+        <button class="btn" id="newChatBtn">＋ New Chat</button>
+        <button class="btn" id="settingsBtn" style="margin-top:8px;">⚙ Settings</button>
+      </div>
+      <ul class="convos" id="convoList"></ul>
+      <div class="sidebar-foot">
+        <div id="modelText">Model: --</div>
+        <div id="latencyText">Latency: --</div>
+        <div id="healthText">Server: --</div>
+      </div>
+    </aside>
+
+    <!-- Chat panel -->
+    <main class="panel chat">
+      <div class="chat-head">
+        <input class="title" id="chatTitle" value="Untitled Conversation" />
+        <div class="status" id="statusText">Ready</div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="attachment-bar" id="attachmentBar">
+        <div class="attachment-list" id="attachmentList"></div>
+      </div>
+
+      <div class="composer">
+        <textarea id="input" placeholder="Type a message... (Enter to send, Shift+Enter for newline)"></textarea>
+        <input type="file" id="fileInput" style="display:none;" multiple
+          accept="image/*,.pdf,.txt,.md,.csv,.json,.py,.js,.ts,.html,.css" />
+        <button class="attach-btn" id="attachBtn" title="Attach file">📎</button>
+        <button class="voice-btn" id="voiceBtn" title="Voice input (click to start/stop)">🎤</button>
+        <button class="send" id="sendBtn">Send</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Hermes Settings</div>
+          <div class="modal-sub">Customize appearance, alerts, security, and memory.</div>
+        </div>
+      </div>
+
+      <div class="settings-shell">
+        <div class="settings-nav">
+          <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="generalTab" id="tabGeneralBtn">General</button>
+            <button class="tab-btn" data-tab="memoryTab" id="tabMemoryBtn">Memory</button>
+            <button class="tab-btn" data-tab="analyticsTab" id="tabAnalyticsBtn">Analytics</button>
+            <button class="tab-btn" data-tab="securityTab" id="tabSecurityBtn">Security</button>
+            <button class="tab-btn" data-tab="shortcutsTab" id="tabShortcutsBtn">Shortcuts</button>
+          </div>
+        </div>
+
+        <div class="settings-content">
+          <!-- General tab -->
+          <div class="tab-panel active" id="generalTab">
+            <div class="settings-grid">
+              <div class="settings-row">
+                <label for="themeSelect">Theme</label>
+                <select id="themeSelect">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <label for="modelSelect">AI Model</label>
+                <select id="modelSelect">
+                  <option value="auto">Auto (Self-Escalation)</option>
+                  <option value="openai/gpt-oss-20b">OpenAI GPT-OSS 20B</option>
+                  <option value="openai/gpt-oss-120b">OpenAI GPT-OSS 120B</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <label for="notificationsToggle">Notifications</label>
+                <input id="notificationsToggle" type="checkbox" />
+              </div>
+            </div>
+            <h4 style="margin: 20px 0 12px 0; font-size: 14px;">Data Management</h4>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="mini-btn" id="exportConvosBtn">Export All Conversations</button>
+              <button class="mini-btn" id="importConvosBtn">Import Conversations</button>
+              <input type="file" id="importFileInput" accept=".json" style="display: none;" />
+            </div>
+            <div class="hint" style="margin-top: 8px;">Export saves all conversations as JSON. Import merges or replaces existing data.</div>
+          </div>
+
+          <!-- Memory tab -->
+          <div class="tab-panel" id="memoryTab">
+            <div class="memory-toolbar">
+              <button class="mini-btn" id="refreshMemoryBtn">Refresh</button>
+              <button class="mini-btn" id="saveLocalMemoryBtn">Save Chat Editor</button>
+              <button class="mini-btn" id="saveGlobalMemoryBtn">Save Global Memory</button>
+              <button class="mini-btn danger" id="clearCurrentMemoryBtn">Clear Current Chat Memory</button>
+              <button class="mini-btn danger" id="clearGlobalMemoryBtn">Clear Global Memory</button>
+              <div class="memory-status" id="memoryStatus">Ready</div>
+            </div>
+            <div class="hint">Add or remove facts with one click, then save.</div>
+            <div class="memory-grid">
+              <div class="memory-block">
+                <h4>Current Chat Messages (JSON array)</h4>
+                <textarea id="convoMemoryEditor" placeholder="[]"></textarea>
+              </div>
+              <div class="memory-block">
+                <h4>Global Memory Facts</h4>
+                <div class="fact-add-row">
+                  <input id="factInput" type="text" placeholder="Add a new fact..." />
+                  <button class="mini-btn" id="addFactBtn">Add</button>
+                </div>
+                <div class="facts-list" id="factsList"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics tab -->
+          <div class="tab-panel" id="analyticsTab">
+            <div class="analytics-grid">
+              <div class="stat-card">
+                <div class="stat-value" id="totalMessagesCount">0</div>
+                <div class="stat-label">Total Messages</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="totalConvosCount">0</div>
+                <div class="stat-label">Conversations</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="avgMessagesPerConvo">0</div>
+                <div class="stat-label">Avg Msgs/Chat</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="mostActiveConvo">--</div>
+                <div class="stat-label">Most Active</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="messagesChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="conversationsChart"></canvas>
+            </div>
+            <div class="hint">Analytics are calculated from local conversation data.</div>
+          </div>
+
+          <!-- Security tab -->
+          <div class="tab-panel" id="securityTab">
+            <div class="settings-grid">
+              <div class="settings-row">
+                <label for="pinEnabledToggle">Enable PIN lock</label>
+                <input id="pinEnabledToggle" type="checkbox" />
+              </div>
+              <div class="settings-row">
+                <label for="pinInput">Set / Update PIN</label>
+                <input id="pinInput" type="password" placeholder="Enter new PIN" />
+              </div>
+              <div class="settings-row">
+                <label for="pinConfirmInput">Confirm PIN</label>
+                <input id="pinConfirmInput" type="password" placeholder="Confirm new PIN" />
+              </div>
+            </div>
+            <div class="hint">PIN is stored locally on this device as a hash.</div>
+          </div>
+
+          <!-- Shortcuts tab -->
+          <div class="tab-panel" id="shortcutsTab">
+            <div class="hint">Click on any shortcut key to record a new combination. Press the keys you want to use.</div>
+            <div class="shortcut-list" id="shortcutList"></div>
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button class="mini-btn" id="resetShortcutsBtn">Reset to Defaults</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" id="cancelSettingsBtn" style="width:auto;">Cancel</button>
+        <button class="btn" id="saveSettingsBtn" style="width:auto;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN unlock modal -->
+  <div class="modal" id="pinModal">
+    <div class="modal-card" style="max-width:420px;">
+      <div class="modal-title">Unlock Hermes</div>
+      <div class="hint">Enter your PIN to continue.</div>
+      <div class="settings-grid">
+        <div class="settings-row" style="grid-template-columns:1fr;">
+          <input id="pinUnlockInput" type="password" placeholder="PIN" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="pinUnlockBtn" style="width:auto;">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notice modal -->
+  <div class="modal" id="noticeModal">
+    <div class="modal-card" style="max-width:480px;">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="noticeTitle">Notice</div>
+          <div class="modal-sub" id="noticeMessage"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="noticeOkBtn" style="width:auto;">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app-utils.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
