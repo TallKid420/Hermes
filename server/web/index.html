@@ -1,59 +1,196 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Hermes" />
   <title>Hermes Remote</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%233b82f6' width='180' height='180' rx='40'/%3E%3Ccircle cx='90' cy='90' r='50' stroke='%23ffffff' stroke-width='6' fill='none'/%3E%3Ctext x='90' y='115' font-family='system-ui' font-size='70' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%233b82f6' width='180' height='180' rx='40'/%3E%3Ccircle cx='90' cy='90' r='50' stroke='%23ffffff' stroke-width='6' fill='none'/%3E%3Ctext x='90' y='115' font-family='system-ui' font-size='70' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkhlcm1lcyBSZW1vdGUiLAogICJzaG9ydF9uYW1lIjogIkhlcm1lcyIsCiAgImRlc2NyaXB0aW9uIjogIllvdXIgcGVyc29uYWwgQUkgYXNzaXN0YW50IHdpdGggY29udmVyc2F0aW9uIGhpc3RvcnkgYW5kIG1lbW9yeSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgInNjb3BlIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMDEzMWEiLAogICJ0aGVtZV9jb2xvciI6ICIjM2I4MmY2IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxODAgMTgwJyUzRSUzQ3JlY3QgZmlsbD0nJTIzM2I4MmY2JyB3aWR0aD0nMTgwJyBoZWlnaHQ9JzE4MCcgcng9JzQwJy8lM0UlM0NjaXJjbGUgY3g9JzkwJyBjeT0nOTAnIHI9JzUwJyBzdHJva2U9JyUyM2ZmZmZmZicgc3Ryb2tlLXdpZHRoPSc2JyBmaWxsPSdub25lJy8lM0UlM0N0ZXh0IHg9JzkwJyB5PScxMTUnIGZvbnQtZmFtaWx5PSdzeXN0ZW0tdWknIGZvbnQtc2l6ZT0nNzAnIGZvbnQtd2VpZ2h0PSc3MDAnIGZpbGw9JyUyM2ZmZmZmZicgdGV4dC1hbmNob3I9J21pZGRsZSclM0VIJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0sCiAgImNhdGVnb3JpZXMiOiBbInByb2R1Y3Rpdml0eSIsICJ1dGlsaXRpZXMiXQp9" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">H</div>
-        <div>
-          <h1>Hermes Remote</h1>
-          <p>Render control plane to your PC listener</p>
-        </div>
+  <div class="loading" id="loading">
+    <div class="loading-card">
+      <div class="loading-title">◯ Hermes Remote</div>
+      <div class="loading-sub">Connecting to Render control plane...</div>
+      <div class="loading-log" id="loadingLog"></div>
+      <div class="loading-foot">Establishing connection to your PC listener...</div>
+    </div>
+  </div>
+
+  <div class="app" id="assistantApp">
+    <aside class="panel sidebar">
+      <div class="sidebar-head">
+        <div class="logo">◯ Hermes Remote</div>
+        <div class="sub">Control plane for your PC</div>
+        <input type="text" id="searchInput" class="search-box" placeholder="Search conversations..." />
+        <button class="btn" id="newChatBtn">+ New Chat</button>
+        <button class="btn" id="settingsBtn" style="margin-top:8px;">⚙ Settings</button>
       </div>
-
-      <button id="newConversationBtn" class="ghost-button">New conversation</button>
-
-      <div class="settings-card">
-        <label>API Base</label>
-        <input id="apiBaseInput" type="text" placeholder="https://your-render-app.onrender.com">
-        <label>User Token</label>
-        <input id="userTokenInput" type="password" placeholder="Optional">
-        <label>Target Device</label>
-        <input id="deviceIdInput" type="text" placeholder="home-pc">
-        <button id="saveSettingsBtn" class="primary-button">Save settings</button>
+      <ul class="convos" id="convoList"></ul>
+      <div class="sidebar-foot">
+        <div id="deviceIdText">Device: --</div>
+        <div id="healthText">Status: --</div>
       </div>
-
-      <div class="conversation-head">Recent Conversations</div>
-      <div id="conversationList" class="conversation-list"></div>
     </aside>
 
-    <main class="chat-panel">
-      <div class="chat-topbar">
-        <div>
-          <div id="conversationTitle" class="conversation-title">No conversation selected</div>
-          <div id="statusText" class="status-text">Idle</div>
-        </div>
-        <button id="refreshBtn" class="ghost-button compact">Refresh</button>
+    <main class="panel chat">
+      <div class="chat-head">
+        <input class="title" id="chatTitle" value="Untitled Conversation" />
+        <div class="status" id="statusText">Ready</div>
       </div>
 
-      <div id="messages" class="messages"></div>
+      <div class="messages" id="messages"></div>
 
-      <form id="composerForm" class="composer">
-        <textarea id="messageInput" rows="3" placeholder="Send a task to your PC..."></textarea>
-        <button id="sendBtn" type="submit" class="primary-button">Send</button>
-      </form>
+      <div class="attachment-bar" id="attachmentBar">
+        <div class="attachment-list" id="attachmentList"></div>
+      </div>
+
+      <div class="composer">
+        <textarea id="input" placeholder="Send a task to your PC..."></textarea>
+        <input type="file" id="fileInput" style="display:none;" multiple accept="image/*,.pdf,.txt,.md,.csv,.json,.py,.js,.ts,.html,.css" />
+        <button class="attach-btn" id="attachBtn" title="Attach image or file">📎</button>
+        <button class="send" id="sendBtn">Send</button>
+      </div>
     </main>
   </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Hermes Settings</div>
+          <div class="modal-sub">Configure remote connection and preferences.</div>
+        </div>
+      </div>
+
+      <div class="settings-shell">
+        <div class="settings-nav">
+          <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="connectionTab" id="tabConnectionBtn">Connection</button>
+            <button class="tab-btn" data-tab="generalTab" id="tabGeneralBtn">General</button>
+            <button class="tab-btn" data-tab="securityTab" id="tabSecurityBtn">Security</button>
+          </div>
+        </div>
+
+        <div class="settings-content">
+          <!-- Connection tab -->
+          <div class="tab-panel active" id="connectionTab">
+            <div class="settings-grid">
+              <div class="settings-row">
+                <label for="apiBaseInput">API Base URL</label>
+                <input id="apiBaseInput" type="text" placeholder="https://hermes-xxx.onrender.com" />
+              </div>
+              <div class="settings-row">
+                <label for="userTokenInput">User Token</label>
+                <input id="userTokenInput" type="password" placeholder="Optional" />
+              </div>
+              <div class="settings-row">
+                <label for="deviceIdInput">Target Device</label>
+                <input id="deviceIdInput" type="text" placeholder="home-pc" />
+              </div>
+            </div>
+            <button class="mini-btn" id="saveConnectionBtn">Save Connection</button>
+            <div class="hint" style="margin-top: 12px;">Your connection settings are stored locally in this browser.</div>
+          </div>
+
+          <!-- General tab -->
+          <div class="tab-panel" id="generalTab">
+            <div class="settings-grid">
+              <div class="settings-row">
+                <label for="themeSelect">Theme</label>
+                <select id="themeSelect">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <label for="notificationsToggle">Notifications</label>
+                <input id="notificationsToggle" type="checkbox" />
+              </div>
+            </div>
+            <h4 style="margin: 20px 0 12px 0; font-size: 14px;">Data Management</h4>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="mini-btn" id="exportConvosBtn">Export All Conversations</button>
+              <button class="mini-btn" id="importConvosBtn">Import Conversations</button>
+              <input type="file" id="importFileInput" accept=".json" style="display: none;" />
+            </div>
+            <div class="hint" style="margin-top: 8px;">Export saves all conversations as JSON. Import merges or replaces existing data.</div>
+          </div>
+
+          <!-- Security tab -->
+          <div class="tab-panel" id="securityTab">
+            <div class="settings-grid">
+              <div class="settings-row">
+                <label for="pinEnabledToggle">Enable PIN lock</label>
+                <input id="pinEnabledToggle" type="checkbox" />
+              </div>
+              <div class="settings-row">
+                <label for="pinInput">Set / Update PIN</label>
+                <input id="pinInput" type="password" placeholder="Enter new PIN" />
+              </div>
+              <div class="settings-row">
+                <label for="pinConfirmInput">Confirm PIN</label>
+                <input id="pinConfirmInput" type="password" placeholder="Confirm new PIN" />
+              </div>
+            </div>
+            <div class="hint">PIN is stored locally on this device as a hash.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" id="cancelSettingsBtn" style="width:auto;">Cancel</button>
+        <button class="btn" id="saveSettingsBtn" style="width:auto;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="pinModal">
+    <div class="modal-card" style="max-width:420px;">
+      <div class="modal-title">Unlock Hermes</div>
+      <div class="hint">Enter your PIN to continue.</div>
+      <div class="settings-grid">
+        <div class="settings-row" style="grid-template-columns:1fr;">
+          <input id="pinUnlockInput" type="password" placeholder="PIN" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="pinUnlockBtn" style="width:auto;">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="noticeModal">
+    <div class="modal-card" style="max-width:480px;">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="noticeTitle">Notice</div>
+          <div class="modal-sub" id="noticeMessage"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="noticeOkBtn" style="width:auto;">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app-utils.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
