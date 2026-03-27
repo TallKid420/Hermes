@@ -3,10 +3,8 @@ services:
     name: hermes-control-plane
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn server:app
+    startCommand: python server.py
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.10
       - key: GROQ_API_KEY
         sync: false
       - key: GROQ_MODEL
