@@ -1,5 +1,0 @@
-groq
-pytz
-flask
-gunicorn
-llama-index-core
