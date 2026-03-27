@@ -1,3 +1,4 @@
 groq
 pytz
 llama-index-core
+pywebview
