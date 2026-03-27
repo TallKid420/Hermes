@@ -1,46 +1,35 @@
 # Hermes Remote Control
 
-Hermes is a split control-plane setup:
+Hermes is split into two runtime folders:
 
-- Render hosts the public server and web UI.
-- Your Windows PC runs a local listener that polls the server and executes tasks locally through `hermes_operator.py` and `executor.py`.
-- You can send tasks from the web UI, the remote terminal client, Telegram, or WhatsApp.
+- `server/` : Render-hosted control plane and web UI
+- `local/` : Windows PC execution stack (listener + operator + tools)
 
-## Files
+This keeps cloud and local responsibilities separate.
 
-- `server.py`: Render-facing control plane and web server
-- `pc_listener.py`: local Windows listener that executes queued jobs
-- `remote_terminal.py`: remote CLI client
-- `hermes_operator.py`: local reasoning and tool orchestration
-- `executor.py`: local tool implementations
-- `web/`: hosted web UI
-- `render.yaml`: Render deployment manifest
+## Folder Layout
 
-## GitHub Setup
-
-1. Copy `.env.example` to `.env` locally and fill in real secrets.
-2. Do not commit `.env`; it is ignored by `.gitignore`.
-3. Initialize a git repository if needed:
-
-```powershell
-git init -b main
-git add .
-git commit -m "Initial Hermes remote control setup"
-```
-
-4. Create a new empty GitHub repository.
-5. Add the remote and push:
-
-```powershell
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
-```
+- `server/server.py`: Render-facing API and webhook server
+- `server/web/`: hosted web UI assets
+- `server/requirements.txt`: dependencies for Render service
+- `local/pc_listener.py`: local job listener that executes requests
+- `local/hermes_operator.py`: local reasoning/orchestration loop
+- `local/executor.py`: local tool implementations
+- `local/remote_terminal.py`: remote CLI client
+- `local/stress_test.py`: concurrent stress/load test client
 
 ## Render Setup
 
-Deploy the repository to Render as a Python web service. `render.yaml` already defines the service.
+Deploy as a Python **Web Service**.
 
-Set these Render environment variables:
+If using `render.yaml`, it is preconfigured with `rootDir: server`.
+If setting manually in dashboard:
+
+- Root Directory: `server`
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `python server.py`
+
+Required environment variables:
 
 - `GROQ_API_KEY`
 - `GROQ_MODEL`
@@ -48,22 +37,25 @@ Set these Render environment variables:
 - `HERMES_DEVICE_KEY`
 - `HERMES_DEFAULT_DEVICE_ID`
 - `HERMES_USER_TOKEN`
-- `TELEGRAM_BOT_TOKEN` if using Telegram
-- `TELEGRAM_SECRET_TOKEN` if using Telegram webhook verification
-- `TWILIO_ACCOUNT_SID` if using WhatsApp through Twilio
-- `TWILIO_AUTH_TOKEN` if using WhatsApp through Twilio
-- `TWILIO_WHATSAPP_FROM` if using WhatsApp through Twilio
 - `SYSTEM_PROMPT`
 
-Render start command:
+Optional environment variables:
 
-```text
-gunicorn server:app
-```
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_SECRET_TOKEN`
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_WHATSAPP_FROM`
 
 ## Local PC Setup
 
-Create a local `.env` on your PC with at least:
+Install local dependencies:
+
+```powershell
+pip install -r local/requirements.txt
+```
+
+Create local `.env` (in repo root) with at least:
 
 ```text
 GROQ_API_KEY=...
@@ -76,49 +68,53 @@ HERMES_DEFAULT_DEVICE_ID=home-pc
 HERMES_USER_TOKEN=your_user_token
 ```
 
-Run the local listener:
+Run your listener on the PC you want to control:
 
 ```powershell
-python pc_listener.py
+python local/pc_listener.py
 ```
 
-## Remote Terminal
+## How To Use It
 
-From another machine:
+Web:
+
+- Open your Render URL in a browser.
+- Send a message/task from the UI.
+- Your PC listener receives and executes it locally.
+
+Terminal from another machine:
 
 ```powershell
-python remote_terminal.py "what time is it in UTC?"
+python local/remote_terminal.py "what time is it in UTC?"
 ```
 
-Or run interactive mode:
+Interactive terminal mode:
 
 ```powershell
-python remote_terminal.py
+python local/remote_terminal.py
 ```
 
-## Web UI
+## Stress Testing
 
-Once deployed, open your Render URL. The UI served from `web/` lets you:
+Before stress testing, ensure `local/pc_listener.py` is running.
 
-- set API base URL
-- set user token
-- choose a target device
-- send tasks and poll job results
+Run 20 requests at concurrency 5:
 
-## Telegram and WhatsApp
+```powershell
+python local/stress_test.py --requests 20 --concurrency 5
+```
 
-Telegram webhook:
+Heavier run (50 requests, concurrency 10):
 
-- point Telegram to `/webhooks/telegram`
-- set `TELEGRAM_SECRET_TOKEN`
+```powershell
+python local/stress_test.py --requests 50 --concurrency 10 --prompt "what time is it in UTC?"
+```
 
-WhatsApp webhook:
-
-- point Twilio to `/webhooks/whatsapp`
+The script reports success count, failure count, average latency, p95 latency, and max latency.
 
 ## Security Notes
 
 - Use a long random value for `HERMES_DEVICE_KEY`.
 - Use a separate long random value for `HERMES_USER_TOKEN`.
-- Rotate any secret that was ever committed or pasted into a public place.
-- Keep the local listener running only on machines you trust.
+- Rotate any secret that was ever committed or pasted in logs/screenshots.
+- Keep the local listener running only on trusted machines.

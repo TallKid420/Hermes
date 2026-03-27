@@ -2,6 +2,7 @@ services:
   - type: web
     name: hermes-control-plane
     env: python
+    rootDir: server
     buildCommand: pip install -r requirements.txt
     startCommand: python server.py
     envVars:
