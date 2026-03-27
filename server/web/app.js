@@ -1,4 +1,4 @@
-const settingsKey = "hermes_remote_settings";
+﻿const settingsKey = "hermes_remote_settings";
 const activeConversationKey = "hermes_remote_active_conversation";
 
 const apiBaseInput = document.getElementById("apiBaseInput");
@@ -202,32 +202,7 @@ newConversationBtn.addEventListener("click", newConversation);
 composerForm.addEventListener("submit", sendMessage);
 
 loadConversations();
-loadConversation(activeConversationId);/**
- * Hermes 2.0 – desktop assistant frontend
- * Communicates with the local Flask server (server.py) on the same origin.
- */
-
-// ── API base: same origin as server.py ────────────────────────────────────────
-const params = new URLSearchParams(location.search);
-const API_BASE = params.get("apiBase") || "/chat";
-const ROOT_API_BASE = API_BASE === "/chat" ? "" : (API_BASE.endsWith("/chat") ? API_BASE.slice(0, -5) : API_BASE);
-const MODEL_FALLBACK = "openai/gpt-oss-20b";
-
-const {
-  attachmentKey,
-  nowTime,
-  wait,
-  escapeHtml,
-  downloadTextFile,
-  extensionForLanguage,
-  buildProgressPhrases,
-  startProgressTicker,
-} = window.HermesUtils || {};
-
-// ── DOM references ─────────────────────────────────────────────────────────────
-const loading             = document.getElementById("loading");
-const loadingLog          = document.getElementById("loadingLog");
-const assistantApp        = document.getElementById("assistantApp");
+loadConversation(activeConversationId);
 const convoList           = document.getElementById("convoList");
 const searchInput         = document.getElementById("searchInput");
 const messages            = document.getElementById("messages");
@@ -281,7 +256,7 @@ const voiceBtn            = document.getElementById("voiceBtn");
 const messagesChart       = document.getElementById("messagesChart");
 const conversationsChart  = document.getElementById("conversationsChart");
 
-// ── state ──────────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ state ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 let conversations = JSON.parse(localStorage.getItem("hermes_web_conversations") || "{}");
 let activeId      = localStorage.getItem("hermes_web_active") || null;
 let settings      = JSON.parse(localStorage.getItem("hermes_web_settings") || "{}");
@@ -296,7 +271,7 @@ let backendReady        = false;
 let backendConnectInProgress = false;
 const AUTO_TITLE_MIN_MESSAGES = 4;
 
-// ── settings defaults ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇ settings defaults ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 const DEFAULT_SHORTCUTS = {
   newChat:    { key: "n", ctrl: true,  shift: false, alt: false, name: "New Chat",      desc: "Create a new conversation" },
   search:     { key: "k", ctrl: true,  shift: false, alt: false, name: "Focus Search",  desc: "Jump to conversation search" },
@@ -317,7 +292,7 @@ if (typeof settings.pin_enabled   !== "boolean") settings.pin_enabled   = false;
 if (!settings.pin_hash)    settings.pin_hash    = "";
 if (!settings.shortcuts)   settings.shortcuts   = JSON.parse(JSON.stringify(DEFAULT_SHORTCUTS));
 
-// ── PIN helper ─────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ PIN helper ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function hashPin(pin) {
   let hash = 0;
   for (let i = 0; i < pin.length; i++) {
@@ -327,7 +302,7 @@ function hashPin(pin) {
   return String(hash >>> 0);
 }
 
-// ── settings UI ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ settings UI ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function ensureModelOptions() {
   const currentModel = settings.model || "auto";
   const unique = new Map();
@@ -358,7 +333,7 @@ function persistSettings() {
   localStorage.setItem("hermes_web_settings", JSON.stringify(settings));
 }
 
-// ── notice modal ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ notice modal ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function showHtmlNotice(title, message) {
   noticeTitle.textContent   = title || "Notice";
   noticeMessage.textContent = message || "";
@@ -366,7 +341,7 @@ function showHtmlNotice(title, message) {
 }
 function closeHtmlNotice() { noticeModal.classList.remove("show"); }
 
-// ── settings modal ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ settings modal ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 async function openSettings() {
   applySettings();
   settingsModal.classList.add("show");
@@ -381,7 +356,7 @@ function activateTab(tabId) {
 
 function setMemoryStatus(msg) { memoryStatus.textContent = msg; }
 
-// ── shortcut helpers ───────────────────────────────────────────────────────────
+// ΓöÇΓöÇ shortcut helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function formatShortcutKey(shortcut) {
   const parts = [];
   if (shortcut.ctrl)  parts.push("Ctrl");
@@ -439,7 +414,7 @@ function matchesShortcut(e, shortcut) {
     && e.key.toLowerCase() === shortcut.key.toLowerCase();
 }
 
-// ── voice input ────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ voice input ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function initVoiceInput() {
   if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
     voiceBtn.style.display = "none";
@@ -451,7 +426,7 @@ function initVoiceInput() {
   recognition.interimResults = true;
   recognition.lang           = "en-US";
   let finalTranscript = "";
-  recognition.onstart  = () => { isRecording = true;  voiceBtn.classList.add("recording");    voiceBtn.textContent = "🔴"; };
+  recognition.onstart  = () => { isRecording = true;  voiceBtn.classList.add("recording");    voiceBtn.textContent = "≡ƒö┤"; };
   recognition.onresult = (event) => {
     let interim = "";
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -469,11 +444,11 @@ function stopVoiceInput()  {
   if (!recognition) return;
   isRecording = false;
   voiceBtn.classList.remove("recording");
-  voiceBtn.textContent = "🎤";
+  voiceBtn.textContent = "≡ƒÄñ";
   try { recognition.stop(); } catch (e) {}
 }
 
-// ── analytics ──────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ analytics ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function calculateAnalytics() {
   const stats = { totalMessages: 0, totalConvos: Object.keys(conversations).length, convoMessageCounts: {}, userMessages: 0, assistantMessages: 0 };
   Object.entries(conversations).forEach(([, convo]) => {
@@ -530,7 +505,7 @@ function renderAnalytics() {
   });
 }
 
-// ── facts / memory ─────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ facts / memory ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function renderFactsList() {
   factsList.innerHTML = "";
   if (!globalFactsDraft.length) {
@@ -543,7 +518,7 @@ function renderFactsList() {
     row.draggable = true;
     row.dataset.index = index;
     row.innerHTML = `
-      <div class="fact-handle">☰</div>
+      <div class="fact-handle">Γÿ░</div>
       <div>${escapeHtml(fact)}</div>
       <button class="fact-remove" data-index="${index}" title="Remove">Remove</button>
     `;
@@ -581,7 +556,7 @@ async function refreshMemoryView() {
     const globalData = globalRes.ok ? await globalRes.json() : { facts: [] };
     globalFactsDraft = (globalData.facts || []).map(f => String(f).trim()).filter(Boolean);
     renderFactsList();
-    setMemoryStatus(`Loaded ${convoData.message_count || 0} server msgs • ${globalFactsDraft.length} global facts`);
+    setMemoryStatus(`Loaded ${convoData.message_count || 0} server msgs ΓÇó ${globalFactsDraft.length} global facts`);
   } catch (err) {
     globalFactsDraft = [];
     renderFactsList();
@@ -589,7 +564,7 @@ async function refreshMemoryView() {
   }
 }
 
-// ── connection / loading ───────────────────────────────────────────────────────
+// ΓöÇΓöÇ connection / loading ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function log(line, cls = "") {
   const ts   = new Date().toLocaleTimeString();
   const span = cls ? `<span class="${cls}">${line}</span>` : line;
@@ -609,7 +584,7 @@ async function connectWithRetries() {
         if (res.ok) {
           const data = await res.json();
           backendReady = true;
-          log(`Connected ✓  model=${data.model || MODEL_FALLBACK}`, "dot");
+          log(`Connected Γ£ô  model=${data.model || MODEL_FALLBACK}`, "dot");
           modelText.textContent  = `Model: ${data.model || MODEL_FALLBACK}`;
           healthText.textContent = "Server: healthy";
           await wait(300);
@@ -632,7 +607,7 @@ async function connectWithRetries() {
   }
 }
 
-// ── conversation management ────────────────────────────────────────────────────
+// ΓöÇΓöÇ conversation management ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function saveState() {
   localStorage.setItem("hermes_web_conversations", JSON.stringify(conversations));
   if (activeId) localStorage.setItem("hermes_web_active", activeId);
@@ -724,7 +699,7 @@ function renderConversations(searchTerm = "") {
   filtered.forEach(([id, convo]) => {
     const li = document.createElement("li");
     li.className = `convo-item ${id === activeId ? "active" : ""}`;
-    li.innerHTML = `<span class="convo-name" title="${escapeHtml(convo.name)}">${escapeHtml(convo.name)}</span><button class="convo-del" title="Delete">🗑</button>`;
+    li.innerHTML = `<span class="convo-name" title="${escapeHtml(convo.name)}">${escapeHtml(convo.name)}</span><button class="convo-del" title="Delete">≡ƒùæ</button>`;
     li.querySelector(".convo-name").onclick = () => { activeId = id; saveState(); renderConversations(); renderMessages(); };
     li.querySelector(".convo-del").onclick  = (e) => { e.stopPropagation(); if (confirm(`Delete '${convo.name}'?`)) deleteConversation(id); };
     convoList.appendChild(li);
@@ -732,7 +707,7 @@ function renderConversations(searchTerm = "") {
   if (activeId && conversations[activeId]) chatTitle.value = conversations[activeId].name;
 }
 
-// ── message rendering ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇ message rendering ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function renderMessages() {
   messages.innerHTML = "";
   const convo = conversations[activeId];
@@ -743,14 +718,14 @@ function renderMessages() {
     const box = document.createElement("div");
     box.className = `msg ${msg.role}`;
     const rendered = marked.parse(msg.content || "");
-    let metaText = `${roleLabel} • ${msg.timestamp || nowTime()}`;
-    if (msg.model) metaText += ` • ${msg.model}`;
+    let metaText = `${roleLabel} ΓÇó ${msg.timestamp || nowTime()}`;
+    if (msg.model) metaText += ` ΓÇó ${msg.model}`;
     box.innerHTML = `<div class="meta">${metaText}</div>${rendered}`;
 
     if (msg.role === "assistant") {
       const dlBtn = document.createElement("button");
       dlBtn.className = "code-download-btn";
-      dlBtn.textContent = "⬇ Download reply";
+      dlBtn.textContent = "Γ¼ç Download reply";
       dlBtn.onclick = () => downloadTextFile(`hermes_reply_${msgIndex + 1}.md`, msg.content || "", "text/markdown");
       box.appendChild(dlBtn);
     }
@@ -763,7 +738,7 @@ function renderMessages() {
       const lang = langClass.replace("language-", "") || "txt";
       const dlBtn = document.createElement("button");
       dlBtn.className = "code-download-btn";
-      dlBtn.textContent = `⬇ Download ${lang} code`;
+      dlBtn.textContent = `Γ¼ç Download ${lang} code`;
       dlBtn.onclick = () => {
         const ext = extensionForLanguage(lang);
         downloadTextFile(`hermes_code_${msgIndex + 1}_${codeIndex + 1}.${ext}`, block.textContent || "");
@@ -776,20 +751,20 @@ function renderMessages() {
   messages.scrollTop = messages.scrollHeight;
 }
 
-// ── attachment handling ────────────────────────────────────────────────────────
+// ΓöÇΓöÇ attachment handling ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function refreshAttachmentState() {
   if (pendingAttachments.length > 0) {
-    attachBtn.textContent = "📎✓";
+    attachBtn.textContent = "≡ƒôÄΓ£ô";
     attachBtn.title = `${pendingAttachments.length} file(s) attached`;
     attachmentList.innerHTML = pendingAttachments.map((file, index) =>
       `<div class="attachment-chip">` +
       `<span class="attachment-chip-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>` +
-      `<button class="attachment-chip-remove" data-remove-index="${index}" title="Remove">✕</button>` +
+      `<button class="attachment-chip-remove" data-remove-index="${index}" title="Remove">Γ£ò</button>` +
       `</div>`
     ).join("");
     attachmentBar.classList.add("show");
   } else {
-    attachBtn.textContent = "📎";
+    attachBtn.textContent = "≡ƒôÄ";
     attachBtn.title = "Attach file";
     attachmentList.innerHTML = "";
     attachmentBar.classList.remove("show");
@@ -818,7 +793,7 @@ fileInput.onchange = (e) => {
 
 voiceBtn.onclick = () => { if (isRecording) stopVoiceInput(); else startVoiceInput(); };
 
-// ── send message ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ send message ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 async function sendMessage() {
   const text = input.value.trim();
   if ((!text && pendingAttachments.length === 0) || !activeId) return;
@@ -938,14 +913,14 @@ async function sendFileMessage(files, promptText) {
   }
 }
 
-// ── send button / enter key ────────────────────────────────────────────────────
+// ΓöÇΓöÇ send button / enter key ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 sendBtn.onclick = sendMessage;
 
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
 
-// ── new chat / search / title ──────────────────────────────────────────────────
+// ΓöÇΓöÇ new chat / search / title ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 newChatBtn.onclick = newConversation;
 settingsBtn.onclick = openSettings;
 
@@ -960,7 +935,7 @@ chatTitle.addEventListener("change", () => {
   renderConversations();
 });
 
-// ── pin unlock ─────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ pin unlock ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 pinUnlockBtn.onclick = () => {
   const entered = pinUnlockInput.value.trim();
   if (!entered) return;
@@ -975,11 +950,11 @@ pinUnlockBtn.onclick = () => {
 };
 pinUnlockInput.addEventListener("keydown", (e) => { if (e.key === "Enter") pinUnlockBtn.click(); });
 
-// ── notice modal ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ notice modal ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 noticeOkBtn.onclick = closeHtmlNotice;
 noticeModal.onclick = (e) => { if (e.target === noticeModal) closeHtmlNotice(); };
 
-// ── settings save/cancel ───────────────────────────────────────────────────────
+// ΓöÇΓöÇ settings save/cancel ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 saveSettingsBtn.onclick = async () => {
   const enablePin   = pinEnabledToggle.checked;
   const newPin      = pinInput.value.trim();
@@ -1012,7 +987,7 @@ saveSettingsBtn.onclick = async () => {
 cancelSettingsBtn.onclick = closeSettings;
 settingsModal.onclick = (e) => { if (e.target === settingsModal) closeSettings(); };
 
-// ── settings tabs ──────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ settings tabs ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 tabButtons.forEach(btn => {
   btn.onclick = () => {
     activateTab(btn.dataset.tab);
@@ -1032,7 +1007,7 @@ resetShortcutsBtn.onclick = () => {
   alert("Shortcuts reset to defaults!");
 };
 
-// ── save local memory (chat editor) ───────────────────────────────────────────
+// ΓöÇΓöÇ save local memory (chat editor) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 saveLocalMemoryBtn.onclick = () => {
   if (!activeId || !conversations[activeId]) { alert("No active conversation selected."); return; }
   try {
@@ -1048,7 +1023,7 @@ saveLocalMemoryBtn.onclick = () => {
   } catch (err) { alert(`Invalid JSON: ${err.message || err}`); }
 };
 
-// ── save global memory ─────────────────────────────────────────────────────────
+// ΓöÇΓöÇ save global memory ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 saveGlobalMemoryBtn.onclick = async () => {
   const deduped = [];
   for (const line of globalFactsDraft) {
@@ -1073,7 +1048,7 @@ saveGlobalMemoryBtn.onclick = async () => {
   }
 };
 
-// ── fact list interactions ─────────────────────────────────────────────────────
+// ΓöÇΓöÇ fact list interactions ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 addFactBtn.onclick = () => {
   const value = String(factInput.value || "").trim();
   if (!value) return;
@@ -1089,7 +1064,7 @@ factsList.addEventListener("click", (e) => {
   if (!Number.isNaN(index)) { globalFactsDraft.splice(index, 1); renderFactsList(); setMemoryStatus(`Removed. ${globalFactsDraft.length} pending facts.`); }
 });
 
-// ── clear memory ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ clear memory ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 clearCurrentMemoryBtn.onclick = async () => {
   if (!activeId) return;
   if (!confirm("Clear current chat memory on server (conversation history)?")) return;
@@ -1111,7 +1086,7 @@ clearGlobalMemoryBtn.onclick = async () => {
   } catch (err) { alert(`Failed: ${err.message || err}`); }
 };
 
-// ── export / import conversations ─────────────────────────────────────────────
+// ΓöÇΓöÇ export / import conversations ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 exportConvosBtn.onclick = () => {
   const dataStr = JSON.stringify(conversations, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
@@ -1148,7 +1123,7 @@ importFileInput.onchange = async (e) => {
   importFileInput.value = "";
 };
 
-// ── global keyboard shortcuts ──────────────────────────────────────────────────
+// ΓöÇΓöÇ global keyboard shortcuts ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 document.addEventListener("keydown", (e) => {
   if (recordingShortcut) { handleShortcutRecording(e); return; }
   const sc = settings.shortcuts || DEFAULT_SHORTCUTS;
@@ -1158,7 +1133,7 @@ document.addEventListener("keydown", (e) => {
   else if (sc.closeModal && matchesShortcut(e, sc.closeModal)) { if (settingsModal.classList.contains("show")) closeSettings(); }
 });
 
-// ── boot ───────────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ boot ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 ensureConversation();
 Object.values(conversations).forEach(ensureConversationMetadata);
 applySettings();
