@@ -3,7 +3,7 @@
 Hermes is a split control-plane setup:
 
 - Render hosts the public server and web UI.
-- Your Windows PC runs a local listener that polls the server and executes tasks locally through `operator.py` and `executor.py`.
+- Your Windows PC runs a local listener that polls the server and executes tasks locally through `hermes_operator.py` and `executor.py`.
 - You can send tasks from the web UI, the remote terminal client, Telegram, or WhatsApp.
 
 ## Files
@@ -11,7 +11,7 @@ Hermes is a split control-plane setup:
 - `server.py`: Render-facing control plane and web server
 - `pc_listener.py`: local Windows listener that executes queued jobs
 - `remote_terminal.py`: remote CLI client
-- `operator.py`: local reasoning and tool orchestration
+- `hermes_operator.py`: local reasoning and tool orchestration
 - `executor.py`: local tool implementations
 - `web/`: hosted web UI
 - `render.yaml`: Render deployment manifest

@@ -2,16 +2,14 @@
 Operator — autonomous multi-step task executor.
 
 Usage:
-    python operator.py                    # interactive
-    python operator.py "build a pong game and run it"
+    python hermes_operator.py                    # interactive
+    python hermes_operator.py "build a pong game and run it"
 """
 
 import os
 import sys
 
-# ── Fix: this file is named 'operator.py', which shadows the stdlib 'operator'
-# module that Python internals depend on.  Move the script directory to the END
-# of sys.path so the stdlib is found first while local imports still work.
+# Keep the script directory at the end of sys.path so stdlib imports resolve first.
 _here = os.path.dirname(os.path.abspath(__file__))
 if sys.path and os.path.abspath(sys.path[0]) == _here:
     sys.path.pop(0)

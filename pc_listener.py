@@ -59,7 +59,7 @@ def _format_output(text: str) -> str:
 def _execute_job(task: str) -> tuple[bool, str, str]:
     script_dir = Path(__file__).parent
     python_exe = os.getenv("HERMES_OPERATOR_PYTHON", sys.executable)
-    operator_script = os.getenv("HERMES_OPERATOR_SCRIPT", str(script_dir / "operator.py"))
+    operator_script = os.getenv("HERMES_OPERATOR_SCRIPT", str(script_dir / "hermes_operator.py"))
     timeout = max(30, int(os.getenv("HERMES_OPERATOR_TIMEOUT", "1800")))
     try:
         child_env = dict(os.environ)
@@ -81,7 +81,7 @@ def _execute_job(task: str) -> tuple[bool, str, str]:
     stdout = _format_output(result.stdout or "")
     stderr = (result.stderr or "").strip()
     if result.returncode != 0:
-        return False, stdout, stderr or f"operator.py exited with code {result.returncode}"
+        return False, stdout, stderr or f"hermes_operator.py exited with code {result.returncode}"
     return True, stdout or "(No response)", stderr
 
 
