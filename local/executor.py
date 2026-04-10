@@ -7,6 +7,7 @@ import uuid
 import random
 import base64
 import os
+import sys
 import platform
 import shutil
 import subprocess
@@ -45,6 +46,27 @@ def _is_protected_path(path: str) -> bool:
         "\\appdata\\local\\programs",
     )
     return any(marker in pl for marker in protected_markers)
+    
+        # Unix-specific protected paths
+        unix_markers = (
+            "/bin",
+            "/sbin",
+            "/usr/bin",
+            "/usr/sbin",
+            "/usr/local/bin",
+            "/etc",
+            "/root",
+            "/boot",
+            "/sys",
+            "/proc",
+            "/dev",
+            "/var/log",
+        )
+        if sys.platform != "win32":
+            if any(marker in pl for marker in unix_markers):
+                return True
+
+        return False
 
 
 def _normalize_shell_command(command: str) -> str:
@@ -53,6 +75,12 @@ def _normalize_shell_command(command: str) -> str:
     cmd = re.sub(r"^powershell(\.exe)?\s+-NoProfile\s+-NonInteractive\s+-Command\s+", "", cmd, flags=re.IGNORECASE)
     cmd = re.sub(r"^powershell(\.exe)?\s+-Command\s+", "", cmd, flags=re.IGNORECASE)
     return cmd
+        """Strip shell wrappers."""
+        cmd = command.strip()
+        if sys.platform == "win32":
+            cmd = re.sub(r"^powershell(\.exe)?\s+-NoProfile\s+-NonInteractive\s+-Command\s+", "", cmd, flags=re.IGNORECASE)
+            cmd = re.sub(r"^powershell(\.exe)?\s+-Command\s+", "", cmd, flags=re.IGNORECASE)
+        return cmd
 
 
 # ── Time ────────────────────────────────────────────────────────────────────
@@ -362,6 +390,27 @@ def run_shell_command(command: str, timeout: int = 30):
         return {"error": f"Command timed out after {timeout}s"}
     except Exception as e:
         return {"error": str(e)}
+        """Run a shell command and return stdout/stderr."""
+        try:
+            normalized = _normalize_shell_command(command)
+            timeout = min(max(1, int(timeout)), 120)
+        
+            if sys.platform == "win32":
+                args = ["powershell", "-NoProfile", "-NonInteractive", "-Command", normalized]
+            else:
+                args = ["bash", "-c", normalized]
+        
+            result = subprocess.run(args, capture_output=True, text=True, timeout=timeout, shell=False)
+            return {
+                "command": normalized,
+                "stdout": result.stdout.strip(),
+                "stderr": result.stderr.strip(),
+                "returncode": result.returncode,
+            }
+        except subprocess.TimeoutExpired:
+            return {"error": f"Command timed out after {timeout}s"}
+        except Exception as e:
+            return {"error": str(e)}
 
 
 def get_system_info():
@@ -392,6 +441,22 @@ def get_disk_usage(path: str = "C:\\"):
         }
     except Exception as e:
         return {"error": str(e)}
+    def get_disk_usage(path: str = "/"):
+        """Return total, used, and free disk space for a drive or path."""
+        try:
+            if not path or path == "/":
+                path = "C:\\" if sys.platform == "win32" else "/"
+            usage = shutil.disk_usage(os.path.expanduser(path))
+            gb = 1024 ** 3
+            return {
+                "path": path,
+                "total_gb": round(usage.total / gb, 2),
+                "used_gb": round(usage.used / gb, 2),
+                "free_gb": round(usage.free / gb, 2),
+                "percent_used": round(usage.used / usage.total * 100, 1),
+            }
+        except Exception as e:
+            return {"error": str(e)}
 
 
 def get_running_processes():
@@ -409,6 +474,31 @@ def get_running_processes():
         return {"count": len(processes), "processes": processes}
     except Exception as e:
         return {"error": str(e)}
+        """List running processes with PID and memory usage."""
+        try:
+            processes = []
+            if sys.platform == "win32":
+                result = subprocess.run(
+                    ["tasklist", "/FO", "CSV", "/NH"],
+                    capture_output=True, text=True, timeout=15
+                )
+                for line in result.stdout.strip().splitlines()[:60]:
+                    parts = [p.strip('"') for p in line.split('","')]
+                    if len(parts) >= 5:
+                        processes.append({"name": parts[0], "pid": parts[1], "memory": parts[4]})
+            else:
+                result = subprocess.run(
+                    ["ps", "aux"],
+                    capture_output=True, text=True, timeout=15
+                )
+                for line in result.stdout.strip().splitlines()[1:61]:
+                    parts = line.split()
+                    if len(parts) >= 11:
+                        processes.append({"name": parts[10] if parts[10] else parts[0], "pid": parts[1], "memory": parts[5]})
+            return {"count": len(processes), "processes": processes}
+        except Exception as e:
+            return {"error": str(e)}
+
 
 
 def kill_process(identifier: str):
@@ -422,6 +512,23 @@ def kill_process(identifier: str):
         return {"identifier": identifier, "stdout": result.stdout.strip(), "returncode": result.returncode}
     except Exception as e:
         return {"error": str(e)}
+        """Kill a process by name or PID."""
+        try:
+            if sys.platform == "win32":
+                if identifier.isdigit():
+                    args = ["taskkill", "/PID", identifier, "/F"]
+                else:
+                    args = ["taskkill", "/IM", identifier, "/F"]
+            else:
+                if identifier.isdigit():
+                    args = ["kill", "-9", identifier]
+                else:
+                    args = ["pkill", "-9", identifier]
+            result = subprocess.run(args, capture_output=True, text=True, timeout=10)
+            return {"identifier": identifier, "stdout": result.stdout.strip(), "returncode": result.returncode}
+        except Exception as e:
+            return {"error": str(e)}
+
 
 
 def open_file(path: str):
@@ -431,6 +538,19 @@ def open_file(path: str):
         return {"opened": path}
     except Exception as e:
         return {"error": str(e)}
+        """Open a file or URL with its default application."""
+        try:
+            expanded = os.path.expanduser(path)
+            if sys.platform == "win32":
+                os.startfile(expanded)
+            elif sys.platform == "darwin":
+                subprocess.run(["open", expanded], check=True)
+            else:
+                subprocess.run(["xdg-open", expanded], check=True)
+            return {"opened": path}
+        except Exception as e:
+            return {"error": str(e)}
+
 
 
 def create_directory(path: str):
@@ -517,6 +637,20 @@ def ping_host(host: str, count: int = 4):
         return {"error": "Ping timed out"}
     except Exception as e:
         return {"error": str(e)}
+        """Ping a hostname or IP address and return latency stats."""
+        try:
+            count = min(max(1, int(count)), 10)
+            if sys.platform == "win32":
+                ping_args = ["ping", "-n", str(count), host]
+            else:
+                ping_args = ["ping", "-c", str(count), host]
+            result = subprocess.run(ping_args, capture_output=True, text=True, timeout=30)
+            return {"host": host, "output": result.stdout.strip(), "returncode": result.returncode}
+        except subprocess.TimeoutExpired:
+            return {"error": "Ping timed out"}
+        except Exception as e:
+            return {"error": str(e)}
+
 
 
 def _call_compound(prompt: str) -> dict:

@@ -53,11 +53,15 @@ def _start_listener() -> None:
         print("[desktop_app] pc_listener.py not found, skipping.")
         return
     env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
-    _listener_proc = subprocess.Popen(
-        [sys.executable, str(listener_script)],
-        env=env,
-        creationflags=subprocess.CREATE_NO_WINDOW,  # no extra console window
-    )
+        # Windows: no extra console window; Unix: run normally
+        kwargs = {"env": env}
+        if sys.platform == "win32":
+            kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+    
+        _listener_proc = subprocess.Popen(
+            [sys.executable, str(listener_script)],
+            **kwargs
+        )
     print(f"[desktop_app] pc_listener started (pid={_listener_proc.pid})")
 
 def _stop_listener() -> None:
